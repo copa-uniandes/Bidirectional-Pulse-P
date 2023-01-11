@@ -15,15 +15,9 @@ package dataStructures;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.StringTokenizer;
 
 public class DataHandler {
 	
@@ -64,12 +58,24 @@ public class DataHandler {
 	 */
 	private PulseGraph Gd;
 	
+	/**
+	 * Type of pulse
+	 */
 	private int type;
 	
+	/**
+	 * Acronym of the txt config file
+	 */
 	private String acro;
 	
+	/**
+	 * Queue of pulses in the forward direction
+	 */
 	public static ArrayList<PendingPulse> pendingQueueF;
 	
+	/**
+	 * Queue of pulses in the backward direction
+	 */
 	public static ArrayList<PendingPulse> pendingQueueB;
 	
 
@@ -84,7 +90,7 @@ public class DataHandler {
 		setLastNode(lastNode);
 		setSource(sourceNode);
 		acro = acronym;
-		type = ty;
+		setType(ty);
 		
 		//Creates the list of arcs. A list of distances and a list of times   --- Serian independientes del sentido de la red ! 
 		Arcs = new int[numArcs][2];
@@ -208,6 +214,7 @@ public class DataHandler {
 	public void ReadDimacs(String netPath) throws NumberFormatException, IOException {
 			File file2 = null;
 			file2 = new File(netPath+acro);
+			@SuppressWarnings("resource")
 			BufferedReader bufRdr2 = new BufferedReader(new FileReader(file2));
 			String line2 = null;
 			int row2 = 0;
@@ -326,6 +333,14 @@ public class DataHandler {
 
 	public void setSource(int source) {
 		Source = source;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 }	
 	

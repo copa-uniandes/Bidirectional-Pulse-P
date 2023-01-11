@@ -56,11 +56,11 @@ public class DukqstraTime {
 		highLevelBuckets = new AproxBucket[numHigh];
 		
 		if(type == 1){
-			G.getVertexByID(source).setMinTime(0);
+			PulseGraph.getVertexByID(source).setMinTime(0);
 		}
 		if(type == 2){
-			G.getVertexByID(source).setMinTime(0);
-			G.getVertexByID(source).setMinTimeB(0);
+			PulseGraph.getVertexByID(source).setMinTime(0);
+			PulseGraph.getVertexByID(source).setMinTimeB(0);
 		}
 		Snum = 0;
 		numNodes = G.getNumNodes();
@@ -71,7 +71,7 @@ public class DukqstraTime {
 		iH = -1;
 		jH = -1;
 		
-		Bucket st =new Bucket(G.getVertexByID(source), 0);
+		Bucket st =new Bucket(PulseGraph.getVertexByID(source), 0);
 		lowLevelBuckets[0] = st;
 		//AproxBucket st2 =new AproxBucket(G.getVertexByID(source), 0);
 		initializeBuckets();

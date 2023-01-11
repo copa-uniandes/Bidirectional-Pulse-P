@@ -15,15 +15,9 @@
 package model;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-
 import dataStructures.DataHandler;
 import dataStructures.DukqstraDist;
 import dataStructures.DukqstraTime;
@@ -102,6 +96,7 @@ public class PulseAlgorithm {
 		File testFile = new File("./instances/Config"+instance+".txt");
 		instanc = instance;
 		
+		@SuppressWarnings("resource")
 		BufferedReader bufRedr = new BufferedReader(new FileReader(testFile));
 		
 		String actLine = null;
@@ -109,8 +104,6 @@ public class PulseAlgorithm {
 		String [] information = new String [6];
 		
 		int rowA = 0;
-		int colA = 0;
-		
 		while((actLine = bufRedr.readLine()) != null && rowA < 6){	
 			String [] info = actLine.split(":");
 			information[rowA] = info[1];
@@ -140,7 +133,7 @@ public class PulseAlgorithm {
 			int numNodesAct = network.getNumNodes();
 			Integer[][] lista = new Integer[numNodesAct][4];
 			for (int i = 0; i < numNodesAct; i++) {
-				VertexPulse actVertex = network.getVertexes()[i];
+				VertexPulse actVertex = PulseGraph.getVertexes()[i];
 				lista[i][0] = actVertex.getMaxDistB();
 				lista[i][1] = actVertex.getMaxTimeB();
 				lista[i][2] = actVertex.getMinDistB();
@@ -163,22 +156,22 @@ public class PulseAlgorithm {
 					
 			// Set the first primal bound
 						
-			int MD=network.getVertexByID(data.getLastNode()-1).getMaxDist();
+			int MD=PulseGraph.getVertexByID(data.getLastNode()-1).getMaxDist();
 			network.setDestiny(data.getSource()-1);
 			network.setPrimalBound(MD);
 			InitialPrimalBound = MD;
-			network.setTimeStar(network.getVertexByID(data.getLastNode()-1).getMinTime());
+			network.setTimeStar(PulseGraph.getVertexByID(data.getLastNode()-1).getMinTime());
 						
 		// Recovers information for the backward pulse
 						
 			for (int i = 0; i < numNodesAct; i++) {
-				VertexPulse actVertex = network.getVertexes()[i];
+				VertexPulse actVertex = PulseGraph.getVertexes()[i];
 				actVertex.setEveryBound(lista[i]);	
 			}
 						
 		// This is the pulse procedure
 						
-				network.depth = depth; //The queue depth
+				PulseGraph.depth = depth; //The queue depth
 						
 		//Starts the clock
 						
@@ -187,11 +180,11 @@ public class PulseAlgorithm {
 		//Bidirectional Pulse !
 						
 				//Check if we already have found the optimal solution
-				if(network.getVertexByID(data.getLastNode()-1).getMaxTime() <= network.TimeC) {
+				if(PulseGraph.getVertexByID(data.getLastNode()-1).getMaxTime() <= PulseGraph.TimeC) {
 
 					//Set the primal bound and the time star
-					network.setPrimalBound(network.getVertexByID(data.getLastNode()-1).getMinDist());
-					network.TimeStar = network.getVertexByID(data.getLastNode()-1).getMaxTime();
+					network.setPrimalBound(PulseGraph.getVertexByID(data.getLastNode()-1).getMinDist());
+					PulseGraph.TimeStar = PulseGraph.getVertexByID(data.getLastNode()-1).getMaxTime();
 
 				}else {
 					runPulses(data,network);
@@ -226,6 +219,7 @@ public class PulseAlgorithm {
 			File testFile = new File("./instances/Config"+instance+".txt");
 			instanc = instance;
 			
+			@SuppressWarnings("resource")
 			BufferedReader bufRedr = new BufferedReader(new FileReader(testFile));
 			
 			String actLine = null;
@@ -233,8 +227,6 @@ public class PulseAlgorithm {
 			String [] information = new String [6];
 			
 			int rowA = 0;
-			int colA = 0;
-			
 			while((actLine = bufRedr.readLine()) != null && rowA < 6){	
 				String [] info = actLine.split(":");
 				information[rowA] = info[1];
@@ -264,7 +256,7 @@ public class PulseAlgorithm {
 				int numNodesAct = network.getNumNodes();
 				Integer[][] lista = new Integer[numNodesAct][4];
 				for (int i = 0; i < numNodesAct; i++) {
-					VertexPulse actVertex = network.getVertexes()[i];
+					VertexPulse actVertex = PulseGraph.getVertexes()[i];
 					lista[i][0] = actVertex.getMaxDistB();
 					lista[i][1] = actVertex.getMaxTimeB();
 					lista[i][2] = actVertex.getMinDistB();
@@ -284,22 +276,22 @@ public class PulseAlgorithm {
 					
 				// Set the first primal bound
 							
-				int MD=network.getVertexByID(data.getLastNode()-1).getMaxDist();
+				int MD=PulseGraph.getVertexByID(data.getLastNode()-1).getMaxDist();
 				network.setDestiny(data.getSource()-1);
 				network.setPrimalBound(MD);
 				InitialPrimalBound = MD;
-				network.setTimeStar(network.getVertexByID(data.getLastNode()-1).getMinTime());
+				network.setTimeStar(PulseGraph.getVertexByID(data.getLastNode()-1).getMinTime());
 							
 			// Recovers information for the backward pulse
 							
 				for (int i = 0; i < numNodesAct; i++) {
-					VertexPulse actVertex = network.getVertexes()[i];
+					VertexPulse actVertex = PulseGraph.getVertexes()[i];
 					actVertex.setEveryBound(lista[i]);	
 				}
 							
 			// This is the pulse procedure
 							
-					network.depth = depth; //The queue depth
+					PulseGraph.depth = depth; //The queue depth
 							
 			//Starts the clock
 							
@@ -330,13 +322,13 @@ public class PulseAlgorithm {
 	 * @return
 	 */
 	private static PulseGraph createGraphF(DataHandler data) {
-		int numNodes = data.NumNodes;
+		int numNodes = DataHandler.NumNodes;
 		PulseGraph Gd = new PulseGraph(numNodes);
 		for (int i = 0; i < numNodes; i++) {
 				Gd.addVertex(new VertexPulse(i) ); //Primero lo creo, y luego lo meto. El id corresponde al n�mero del nodo
 		}
 		for(int i = 0; i <data.NumArcs; i ++){
-			Gd.addWeightedEdge( Gd.getVertexByID(data.Arcs[i][0]), Gd.getVertexByID(data.Arcs[i][1]),data.Distance[i],data.Time[i], i);			
+			Gd.addWeightedEdge( PulseGraph.getVertexByID(DataHandler.Arcs[i][0]), PulseGraph.getVertexByID(DataHandler.Arcs[i][1]),DataHandler.Distance[i],DataHandler.Time[i], i);			
 		}
 		return Gd;
 	}
@@ -347,7 +339,7 @@ public class PulseAlgorithm {
 	 * @return
 	 */
 	private static PulseGraph createGraphB(DataHandler data) {
-		int numNodes = data.NumNodes;
+		int numNodes = DataHandler.NumNodes;
 		PulseGraph Gd = new PulseGraph(numNodes);
 		for (int i = 0; i < numNodes; i++) {
 				Gd.addVertex(new VertexPulse(i) ); //Primero lo creo, y luego lo meto. El id corresponde al n�mero del nodo
@@ -355,7 +347,7 @@ public class PulseAlgorithm {
 		//System.out.println("Pase a los arcos");
 		for(int i = 0; i <data.NumArcs; i ++){
 			//System.out.println(data.Arcs[i][1]+ " - "+data.Arcs[i][0]+ " - "+data.Distance[i]+ " - "+data.Time[i]);
-			Gd.addWeightedEdge( Gd.getVertexByID(data.Arcs[i][1]), Gd.getVertexByID(data.Arcs[i][0]),data.Distance[i], data.Time[i], i);			
+			Gd.addWeightedEdge( PulseGraph.getVertexByID(DataHandler.Arcs[i][1]), PulseGraph.getVertexByID(DataHandler.Arcs[i][0]),DataHandler.Distance[i], DataHandler.Time[i], i);			
 		}
 		return Gd;
 	}
@@ -392,7 +384,7 @@ public class PulseAlgorithm {
 	public static void runPulses(DataHandler data, PulseGraph network) throws InterruptedException {
 		Thread tpulse1 = new Thread();
 		Thread tpulse2 = new Thread();
-		ArrayList threads = new ArrayList();
+		ArrayList<pulseTask> threads = new ArrayList<pulseTask>();
 		pulseTask task1 = new pulseTask(1,network,threads,data.getLastNode(),data.getSource());
 		pulseTask task2 = new pulseTask(2,network,threads,data.getLastNode(),data.getSource());
 		threads.add(task1);
@@ -408,7 +400,7 @@ public class PulseAlgorithm {
 	public static void runPulsesPerimeter(DataHandler data, PulseGraph network) throws InterruptedException {
 		Thread tpulse1 = new Thread();
 		Thread tpulse2 = new Thread();
-		ArrayList threads = new ArrayList();
+		ArrayList<pulseTask2> threads = new ArrayList<pulseTask2>();
 		pulseTask2 task1 = new pulseTask2(1,network,threads,data.getLastNode(),data.getSource());
 		pulseTask2 task2 = new pulseTask2(2,network,threads,data.getLastNode(),data.getSource());
 		threads.add(task1);
@@ -423,10 +415,10 @@ public class PulseAlgorithm {
 	
 	public static void resetAll(DataHandler data, PulseGraph network) {
 		data.CvsInput = null;
-		data.Arcs = null;
-		data.Distance = null;
-		data.pendingQueueB = null;
-		data.pendingQueueF = null;
+		DataHandler.Arcs = null;
+		DataHandler.Distance = null;
+		DataHandler.pendingQueueB = null;
+		DataHandler.pendingQueueF = null;
 		network = null;
 		System.gc();
 		
@@ -441,19 +433,19 @@ public class PulseAlgorithm {
 	 */
 	public static ArrayList<Integer> returnPathF(PulseGraph network) {
 		ArrayList<Integer> path = new ArrayList<Integer>();
-		int nodoInicial = network.finalNodeF;
+		int nodoInicial = PulseGraph.finalNodeF;
 		boolean termine = false;
-		double costoAcumulado = network.finalCostF;
-		double tiempoAcumulado = network.finalTimeF2;
+		double costoAcumulado = PulseGraph.finalCostF;
+		double tiempoAcumulado = PulseGraph.finalTimeF2;
 		
 		while(termine == false) {
-			int nodoActual = network.destiny;
-			for(int i = 0; i < network.getVertexByID(nodoInicial).magicIndex.size(); i++) {
-				int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(i);
+			int nodoActual = PulseGraph.destiny;
+			for(int i = 0; i < PulseGraph.getVertexByID(nodoInicial).magicIndex.size(); i++) {
+				int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(i);
 				int a = DataHandler.Arcs[e][1];
 				
-				if(costoAcumulado + DataHandler.Distance[e] + network.getVertexByID(a).minDist == network.PrimalBound ) {
-					if(tiempoAcumulado+ DataHandler.Time[e] + network.getVertexByID(a).maxTime == network.TimeStar) {
+				if(costoAcumulado + DataHandler.Distance[e] + PulseGraph.getVertexByID(a).minDist == PulseGraph.PrimalBound ) {
+					if(tiempoAcumulado+ DataHandler.Time[e] + PulseGraph.getVertexByID(a).maxTime == PulseGraph.TimeStar) {
 						costoAcumulado+=DataHandler.Distance[e];
 						tiempoAcumulado+=DataHandler.Time[e];
 						nodoActual = a;	
@@ -463,7 +455,7 @@ public class PulseAlgorithm {
 			}
 		
 			path.add(nodoActual);
-			if(nodoActual == network.destiny) {
+			if(nodoActual == PulseGraph.destiny) {
 				termine = true;
 			}else {
 				nodoInicial = nodoActual;
@@ -478,26 +470,26 @@ public class PulseAlgorithm {
 		//Go back:
 		
 		termine = false;
-		costoAcumulado = network.PrimalBound - network.finalCostF2;
-		tiempoAcumulado = network.TimeStar - network.finalTimeF2;
-		nodoInicial = network.finalNodeF;
+		costoAcumulado = PulseGraph.PrimalBound - PulseGraph.finalCostF2;
+		tiempoAcumulado = PulseGraph.TimeStar - PulseGraph.finalTimeF2;
+		nodoInicial = PulseGraph.finalNodeF;
 		while(termine == false) {
 			int nodoActual = 0;
 			boolean cambie = false;
-			ArrayList<PendingPulse> pendingPulses = network.getVertexByID(nodoInicial).pendF;
+			ArrayList<PendingPulse> pendingPulses = PulseGraph.getVertexByID(nodoInicial).pendF;
 			for(int i = 0; i < pendingPulses.size() && !cambie;i++) {
 				PendingPulse p = pendingPulses.get(i);
-				if(p.getDist() +costoAcumulado == network.PrimalBound) {
-					if(p.getTime() +  tiempoAcumulado == network.TimeStar) {
+				if(p.getDist() +costoAcumulado == PulseGraph.PrimalBound) {
+					if(p.getTime() +  tiempoAcumulado == PulseGraph.TimeStar) {
 						nodoActual = p.getPredId();
-						for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex2.size() && !cambie; j++) {
-							int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(j);
+						for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size() && !cambie; j++) {
+							int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(j);
 							int a = DataHandler.Arcs[e][0];
 							if(a == nodoActual) {
-								ArrayList<PendingPulse> pendingPulsesAux = network.getVertexByID(nodoActual).pendF;
+								ArrayList<PendingPulse> pendingPulsesAux = PulseGraph.getVertexByID(nodoActual).pendF;
 								for(int ii = 0; ii < pendingPulsesAux.size();ii++) {
 									PendingPulse pp = pendingPulsesAux.get(ii);
-									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == network.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == network.TimeStar ) {
+									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == PulseGraph.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == PulseGraph.TimeStar ) {
 										cambie = true;
 										costoAcumulado+=DataHandler.Distance[e];
 										tiempoAcumulado+=DataHandler.Time[e];
@@ -511,8 +503,8 @@ public class PulseAlgorithm {
 			path.add(nodoActual);
 			if(nodoActual == 0) {
 				termine = true;
-				for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex2.size(); j++) {
-					int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(j);
+				for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size(); j++) {
+					int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(j);
 					int a = DataHandler.Arcs[e][0];
 					if(a == nodoActual) {
 						costoAcumulado+=DataHandler.Distance[e];
@@ -528,7 +520,7 @@ public class PulseAlgorithm {
 		     path.set(i, path.get(path.size() - i - 1));
 		     path.set(path.size() - i - 1, (Integer) temp);
 		   }
-		if(costoAcumulado != network.PrimalBound) {
+		if(costoAcumulado != PulseGraph.PrimalBound) {
 			System.out.println("El costo no me dio igual...peligro");
 		}
 		return path;
@@ -541,17 +533,17 @@ public class PulseAlgorithm {
 	 */
 	public static ArrayList<Integer> returnPathB(PulseGraph network) {
 		ArrayList<Integer> path = new ArrayList<Integer>();
-		int nodoInicial = network.finalNodeB;
+		int nodoInicial = PulseGraph.finalNodeB;
 		boolean termine = false;
-		double costoAcumulado = network.finalCostB2;
-		double tiempoAcumulado = network.finalTimeB2;
+		double costoAcumulado = PulseGraph.finalCostB2;
+		double tiempoAcumulado = PulseGraph.finalTimeB2;
 		while(termine == false) {
 			int nodoActual = 0;
-			for(int i = 0; i < network.getVertexByID(nodoInicial).magicIndex2.size(); i++) {
-				int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(i);
+			for(int i = 0; i < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size(); i++) {
+				int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(i);
 				int a = DataHandler.Arcs[e][0];
-				if(costoAcumulado+ DataHandler.Distance[e] + network.getVertexByID(a).minDistB == network.PrimalBound ) {
-					if(tiempoAcumulado + DataHandler.Time[e] + network.getVertexByID(a).maxTimeB == network.TimeStar) {
+				if(costoAcumulado+ DataHandler.Distance[e] + PulseGraph.getVertexByID(a).minDistB == PulseGraph.PrimalBound ) {
+					if(tiempoAcumulado + DataHandler.Time[e] + PulseGraph.getVertexByID(a).maxTimeB == PulseGraph.TimeStar) {
 						costoAcumulado+=DataHandler.Distance[e];
 						tiempoAcumulado+=DataHandler.Time[e];
 						nodoActual = a;	
@@ -574,26 +566,26 @@ public class PulseAlgorithm {
 		
 		//Go back:
 		termine = false;
-		costoAcumulado = network.PrimalBound - network.finalCostB2;
-		tiempoAcumulado = network.TimeStar - network.finalTimeB2;
-		nodoInicial = network.finalNodeB;
+		costoAcumulado = PulseGraph.PrimalBound - PulseGraph.finalCostB2;
+		tiempoAcumulado = PulseGraph.TimeStar - PulseGraph.finalTimeB2;
+		nodoInicial = PulseGraph.finalNodeB;
 		while(termine == false) {
-			int nodoActual = network.destiny;
+			int nodoActual = PulseGraph.destiny;
 			boolean cambie = false;
-			ArrayList<PendingPulse> pendingPulses = network.getVertexByID(nodoInicial).pendB;
+			ArrayList<PendingPulse> pendingPulses = PulseGraph.getVertexByID(nodoInicial).pendB;
 			for(int i = 0; i < pendingPulses.size() && !cambie;i++) {
 				PendingPulse p = pendingPulses.get(i);
-				if(p.getDist() +costoAcumulado == network.PrimalBound) {
-					if(p.getTime() +  tiempoAcumulado == network.TimeStar) {
+				if(p.getDist() +costoAcumulado == PulseGraph.PrimalBound) {
+					if(p.getTime() +  tiempoAcumulado == PulseGraph.TimeStar) {
 						nodoActual = p.getPredId();
-						for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex.size() && !cambie; j++) {
-							int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(j);
+						for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex.size() && !cambie; j++) {
+							int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(j);
 							int a = DataHandler.Arcs[e][1];
 							if(a == nodoActual) {
-								ArrayList<PendingPulse> pendingPulsesAux = network.getVertexByID(nodoActual).pendB;
+								ArrayList<PendingPulse> pendingPulsesAux = PulseGraph.getVertexByID(nodoActual).pendB;
 								for(int ii = 0; ii < pendingPulsesAux.size();ii++) {
 									PendingPulse pp = pendingPulsesAux.get(ii);
-									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == network.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == network.TimeStar ) {
+									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == PulseGraph.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == PulseGraph.TimeStar ) {
 										cambie = true;
 										costoAcumulado+=DataHandler.Distance[e];
 										tiempoAcumulado+=DataHandler.Time[e];
@@ -605,10 +597,10 @@ public class PulseAlgorithm {
 				}
 			}
 			path.add(nodoActual);
-			if(nodoActual == network.destiny) {
+			if(nodoActual == PulseGraph.destiny) {
 				termine = true;
-				for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex.size(); j++) {
-					int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(j);
+				for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex.size(); j++) {
+					int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(j);
 					int a = DataHandler.Arcs[e][1];
 					if(a == nodoActual) {
 						costoAcumulado+=DataHandler.Distance[e];
@@ -619,7 +611,7 @@ public class PulseAlgorithm {
 				nodoInicial = nodoActual;
 			}
 		}		
-		if(costoAcumulado != network.PrimalBound) {
+		if(costoAcumulado != PulseGraph.PrimalBound) {
 			System.out.println("El costo no me dio igual...peligro");
 		}
 		return path;
@@ -632,19 +624,19 @@ public class PulseAlgorithm {
 	 */
 	public static ArrayList<Integer> returnPathF2(PulseGraph network) {
 		ArrayList<Integer> path = new ArrayList<Integer>();
-		int nodoInicial = network.finalNodeF;
+		int nodoInicial = PulseGraph.finalNodeF;
 		boolean termine = false;
-		double costoAcumulado = network.finalCostF2;
-		double tiempoAcumulado = network.finalTimeF2;
+		double costoAcumulado = PulseGraph.finalCostF2;
+		double tiempoAcumulado = PulseGraph.finalTimeF2;
 		
 		while(termine == false) {
-			int nodoActual = network.destiny;
-			for(int i = 0; i < network.getVertexByID(nodoInicial).magicIndex.size(); i++) {
-				int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(i);
+			int nodoActual = PulseGraph.destiny;
+			for(int i = 0; i < PulseGraph.getVertexByID(nodoInicial).magicIndex.size(); i++) {
+				int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(i);
 				int a = DataHandler.Arcs[e][1];
 				
-				if(costoAcumulado + DataHandler.Distance[e] + network.getVertexByID(a).maxDist == network.PrimalBound ) {
-					if(tiempoAcumulado + DataHandler.Time[e] + network.getVertexByID(a).minTime == network.TimeStar) {
+				if(costoAcumulado + DataHandler.Distance[e] + PulseGraph.getVertexByID(a).maxDist == PulseGraph.PrimalBound ) {
+					if(tiempoAcumulado + DataHandler.Time[e] + PulseGraph.getVertexByID(a).minTime == PulseGraph.TimeStar) {
 						costoAcumulado+=DataHandler.Distance[e];
 						tiempoAcumulado+=DataHandler.Time[e];
 						nodoActual = a;	
@@ -654,7 +646,7 @@ public class PulseAlgorithm {
 			}
 		
 			path.add(nodoActual);
-			if(nodoActual == network.destiny) {
+			if(nodoActual == PulseGraph.destiny) {
 				termine = true;
 			}else {
 				nodoInicial = nodoActual;
@@ -667,26 +659,26 @@ public class PulseAlgorithm {
 		   }
 		//Go back:
 		termine = false;
-		costoAcumulado = network.PrimalBound - network.finalCostF2;
-		tiempoAcumulado = network.TimeStar - network.finalTimeF2;
-		nodoInicial = network.finalNodeF;
+		costoAcumulado = PulseGraph.PrimalBound - PulseGraph.finalCostF2;
+		tiempoAcumulado = PulseGraph.TimeStar - PulseGraph.finalTimeF2;
+		nodoInicial = PulseGraph.finalNodeF;
 		while(termine == false) {
 			int nodoActual = 0;
 			boolean cambie = false;
-			ArrayList<PendingPulse> pendingPulses = network.getVertexByID(nodoInicial).pendF;
+			ArrayList<PendingPulse> pendingPulses = PulseGraph.getVertexByID(nodoInicial).pendF;
 			for(int i = 0; i < pendingPulses.size() && !cambie;i++) {
 				PendingPulse p = pendingPulses.get(i);
-				if(p.getDist() +costoAcumulado == network.PrimalBound) {
-					if(p.getTime() +  tiempoAcumulado == network.TimeStar) {
+				if(p.getDist() +costoAcumulado == PulseGraph.PrimalBound) {
+					if(p.getTime() +  tiempoAcumulado == PulseGraph.TimeStar) {
 						nodoActual = p.getPredId();
-						for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex2.size() && !cambie; j++) {
-							int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(j);
+						for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size() && !cambie; j++) {
+							int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(j);
 							int a = DataHandler.Arcs[e][0];
 							if(a == nodoActual) {
-								ArrayList<PendingPulse> pendingPulsesAux = network.getVertexByID(nodoActual).pendF;
+								ArrayList<PendingPulse> pendingPulsesAux = PulseGraph.getVertexByID(nodoActual).pendF;
 								for(int ii = 0; ii < pendingPulsesAux.size();ii++) {
 									PendingPulse pp = pendingPulsesAux.get(ii);
-									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == network.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == network.TimeStar ) {
+									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == PulseGraph.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == PulseGraph.TimeStar ) {
 										cambie = true;
 										costoAcumulado+=DataHandler.Distance[e];
 										tiempoAcumulado+=DataHandler.Time[e];
@@ -700,8 +692,8 @@ public class PulseAlgorithm {
 			path.add(nodoActual);
 			if(nodoActual == 0) {
 				termine = true;
-				for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex2.size(); j++) {
-					int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(j);
+				for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size(); j++) {
+					int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(j);
 					int a = DataHandler.Arcs[e][0];
 					if(a == nodoActual) {
 						costoAcumulado+=DataHandler.Distance[e];
@@ -717,7 +709,7 @@ public class PulseAlgorithm {
 		     path.set(i, path.get(path.size() - i - 1));
 		     path.set(path.size() - i - 1, (Integer) temp);
 		   }
-		if(costoAcumulado != network.PrimalBound) {
+		if(costoAcumulado != PulseGraph.PrimalBound) {
 			System.out.println("El costo no me dio igual...peligro");
 		}
 		return path;
@@ -730,22 +722,20 @@ public class PulseAlgorithm {
 	 */
 	public static ArrayList<Integer> returnPathB2(PulseGraph network) {
 		ArrayList<Integer> path = new ArrayList<Integer>();
-		int nodoInicial = network.finalNodeB;
+		int nodoInicial = PulseGraph.finalNodeB;
 		boolean termine = false;
-		double costoAcumulado = network.finalCostB2;
-		double tiempoAcumulado = network.finalTimeB2;
-		double prueba = 0;
+		double costoAcumulado = PulseGraph.finalCostB2;
+		double tiempoAcumulado = PulseGraph.finalTimeB2;
 		while(termine == false) {
 			int nodoActual = 0;
-			for(int i = 0; i < network.getVertexByID(nodoInicial).magicIndex2.size(); i++) {
-				int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(i);
+			for(int i = 0; i < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size(); i++) {
+				int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(i);
 				int a = DataHandler.Arcs[e][0];
-				if(costoAcumulado + DataHandler.Distance[e] + network.getVertexByID(a).maxDistB == network.PrimalBound ) {
-					if(tiempoAcumulado + DataHandler.Time[e] + network.getVertexByID(a).minTimeB == network.TimeStar) {
+				if(costoAcumulado + DataHandler.Distance[e] + PulseGraph.getVertexByID(a).maxDistB == PulseGraph.PrimalBound ) {
+					if(tiempoAcumulado + DataHandler.Time[e] + PulseGraph.getVertexByID(a).minTimeB == PulseGraph.TimeStar) {
 						costoAcumulado+=DataHandler.Distance[e];
 						tiempoAcumulado+=DataHandler.Time[e];
-						nodoActual = a;	
-						prueba += DataHandler.Time[e];
+						nodoActual = a;
 					}
 				}
 			}
@@ -766,26 +756,26 @@ public class PulseAlgorithm {
 		//Go back:
 		
 		termine = false;
-		costoAcumulado = network.PrimalBound - network.finalCostB2;
-		tiempoAcumulado = network.TimeStar - network.finalTimeB2;
-		nodoInicial = network.finalNodeB;
+		costoAcumulado = PulseGraph.PrimalBound - PulseGraph.finalCostB2;
+		tiempoAcumulado = PulseGraph.TimeStar - PulseGraph.finalTimeB2;
+		nodoInicial = PulseGraph.finalNodeB;
 		while(termine == false) {
-			int nodoActual = network.destiny;
+			int nodoActual = PulseGraph.destiny;
 			boolean cambie = false;
-			ArrayList<PendingPulse> pendingPulses = network.getVertexByID(nodoInicial).pendB;
+			ArrayList<PendingPulse> pendingPulses = PulseGraph.getVertexByID(nodoInicial).pendB;
 			for(int i = 0; i < pendingPulses.size() && !cambie;i++) {
 				PendingPulse p = pendingPulses.get(i);
-				if(p.getDist() +costoAcumulado == network.PrimalBound) {
-					if(p.getTime() +  tiempoAcumulado == network.TimeStar) {
+				if(p.getDist() +costoAcumulado == PulseGraph.PrimalBound) {
+					if(p.getTime() +  tiempoAcumulado == PulseGraph.TimeStar) {
 						nodoActual = p.getPredId();
-						for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex.size() && !cambie; j++) {
-							int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(j);
+						for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex.size() && !cambie; j++) {
+							int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(j);
 							int a = DataHandler.Arcs[e][1];
 							if(a == nodoActual) {
-								ArrayList<PendingPulse> pendingPulsesAux = network.getVertexByID(nodoActual).pendB;
+								ArrayList<PendingPulse> pendingPulsesAux = PulseGraph.getVertexByID(nodoActual).pendB;
 								for(int ii = 0; ii < pendingPulsesAux.size();ii++) {
 									PendingPulse pp = pendingPulsesAux.get(ii);
-									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == network.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == network.TimeStar ) {
+									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == PulseGraph.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == PulseGraph.TimeStar ) {
 										cambie = true;
 										costoAcumulado+=DataHandler.Distance[e];
 										tiempoAcumulado+=DataHandler.Time[e];
@@ -797,10 +787,10 @@ public class PulseAlgorithm {
 				}
 			}
 			path.add(nodoActual);
-			if(nodoActual == network.destiny) {
+			if(nodoActual == PulseGraph.destiny) {
 				termine = true;
-				for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex.size(); j++) {
-					int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(j);
+				for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex.size(); j++) {
+					int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(j);
 					int a = DataHandler.Arcs[e][1];
 					if(a == nodoActual) {
 						costoAcumulado+=DataHandler.Distance[e];
@@ -811,7 +801,7 @@ public class PulseAlgorithm {
 				nodoInicial = nodoActual;
 			}
 		}		
-		if(costoAcumulado != network.PrimalBound) {
+		if(costoAcumulado != PulseGraph.PrimalBound) {
 			System.out.println("El costo no me dio igual...peligro");
 		}
 		return path;
@@ -825,35 +815,35 @@ public class PulseAlgorithm {
 	 */
 	public static ArrayList<Integer> returnPathJP(PulseGraph network) {
 		ArrayList<Integer> path = new ArrayList<Integer>();
-		int nodoInicial = network.finalNodeB;
+		int nodoInicial = PulseGraph.finalNodeB;
 		boolean termine = false;
-		double costoAcumulado = network.finalCostB2;
-		double tiempoAcumulado = network.finalTimeB2;
-		double prueba = 0;
+		double costoAcumulado = PulseGraph.finalCostB2;
+		double tiempoAcumulado = PulseGraph.finalTimeB2;
+		
 	
 		//Forward direction
 		
 		termine = false;
-		costoAcumulado = network.PrimalBound - network.finalCostF2;
-		tiempoAcumulado = network.TimeStar - network.finalTimeF2;
-		nodoInicial = network.finalNodeF;
+		costoAcumulado = PulseGraph.PrimalBound - PulseGraph.finalCostF2;
+		tiempoAcumulado = PulseGraph.TimeStar - PulseGraph.finalTimeF2;
+		nodoInicial = PulseGraph.finalNodeF;
 		while(termine == false) {
 			int nodoActual = 0;
 			boolean cambie = false;
-			ArrayList<PendingPulse> pendingPulses = network.getVertexByID(nodoInicial).pendF;
+			ArrayList<PendingPulse> pendingPulses = PulseGraph.getVertexByID(nodoInicial).pendF;
 			for(int i = 0; i < pendingPulses.size() && !cambie;i++) {
 				PendingPulse p = pendingPulses.get(i);
-				if(p.getDist() +costoAcumulado == network.PrimalBound) {
-					if(p.getTime() +  tiempoAcumulado == network.TimeStar) {
+				if(p.getDist() +costoAcumulado == PulseGraph.PrimalBound) {
+					if(p.getTime() +  tiempoAcumulado == PulseGraph.TimeStar) {
 						nodoActual = p.getPredId();
-						for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex2.size() && !cambie; j++) {
-							int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(j);
+						for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size() && !cambie; j++) {
+							int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(j);
 							int a = DataHandler.Arcs[e][0];
 							if(a == nodoActual) {
-								ArrayList<PendingPulse> pendingPulsesAux = network.getVertexByID(nodoActual).pendF;
+								ArrayList<PendingPulse> pendingPulsesAux = PulseGraph.getVertexByID(nodoActual).pendF;
 								for(int ii = 0; ii < pendingPulsesAux.size();ii++) {
 									PendingPulse pp = pendingPulsesAux.get(ii);
-									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == network.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == network.TimeStar ) {
+									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == PulseGraph.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == PulseGraph.TimeStar ) {
 										cambie = true;
 										costoAcumulado+=DataHandler.Distance[e];
 										tiempoAcumulado+=DataHandler.Time[e];
@@ -867,8 +857,8 @@ public class PulseAlgorithm {
 			path.add(nodoActual);
 			if(nodoActual == 0) {
 				termine = true;
-				for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex2.size(); j++) {
-					int e = (Integer) network.getVertexByID(nodoInicial).magicIndex2.get(j);
+				for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex2.size(); j++) {
+					int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex2.get(j);
 					int a = DataHandler.Arcs[e][0];
 					if(a == nodoActual) {
 						costoAcumulado+=DataHandler.Distance[e];
@@ -888,26 +878,26 @@ public class PulseAlgorithm {
 		//Backward direction
 		
 		termine = false;
-		costoAcumulado = network.PrimalBound - network.finalCostB2;
-		tiempoAcumulado = network.TimeStar - network.finalTimeB2;
-		nodoInicial = network.finalNodeB;
+		costoAcumulado = PulseGraph.PrimalBound - PulseGraph.finalCostB2;
+		tiempoAcumulado = PulseGraph.TimeStar - PulseGraph.finalTimeB2;
+		nodoInicial = PulseGraph.finalNodeB;
 		while(termine == false) {
-			int nodoActual = network.destiny;
+			int nodoActual = PulseGraph.destiny;
 			boolean cambie = false;
-			ArrayList<PendingPulse> pendingPulses = network.getVertexByID(nodoInicial).pendB;
+			ArrayList<PendingPulse> pendingPulses = PulseGraph.getVertexByID(nodoInicial).pendB;
 			for(int i = 0; i < pendingPulses.size() && !cambie;i++) {
 				PendingPulse p = pendingPulses.get(i);
-				if(p.getDist() +costoAcumulado == network.PrimalBound) {
-					if(p.getTime() +  tiempoAcumulado == network.TimeStar) {
+				if(p.getDist() +costoAcumulado == PulseGraph.PrimalBound) {
+					if(p.getTime() +  tiempoAcumulado == PulseGraph.TimeStar) {
 						nodoActual = p.getPredId();
-						for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex.size() && !cambie; j++) {
-							int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(j);
+						for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex.size() && !cambie; j++) {
+							int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(j);
 							int a = DataHandler.Arcs[e][1];
 							if(a == nodoActual) {
-								ArrayList<PendingPulse> pendingPulsesAux = network.getVertexByID(nodoActual).pendB;
+								ArrayList<PendingPulse> pendingPulsesAux = PulseGraph.getVertexByID(nodoActual).pendB;
 								for(int ii = 0; ii < pendingPulsesAux.size();ii++) {
 									PendingPulse pp = pendingPulsesAux.get(ii);
-									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == network.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == network.TimeStar ) {
+									if(pp.getDist() + costoAcumulado + DataHandler.Distance[e] == PulseGraph.PrimalBound && pp.getTime() + tiempoAcumulado + DataHandler.Time[e] == PulseGraph.TimeStar ) {
 										cambie = true;
 										costoAcumulado+=DataHandler.Distance[e];
 										tiempoAcumulado+=DataHandler.Time[e];
@@ -919,10 +909,10 @@ public class PulseAlgorithm {
 				}
 			}
 			path.add(nodoActual);
-			if(nodoActual == network.destiny) {
+			if(nodoActual == PulseGraph.destiny) {
 				termine = true;
-				for(int j = 0; j < network.getVertexByID(nodoInicial).magicIndex.size(); j++) {
-					int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(j);
+				for(int j = 0; j < PulseGraph.getVertexByID(nodoInicial).magicIndex.size(); j++) {
+					int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(j);
 					int a = DataHandler.Arcs[e][1];
 					if(a == nodoActual) {
 						costoAcumulado+=DataHandler.Distance[e];
@@ -933,7 +923,7 @@ public class PulseAlgorithm {
 				nodoInicial = nodoActual;
 			}
 		}		
-		if(costoAcumulado != network.PrimalBound) {
+		if(costoAcumulado != PulseGraph.PrimalBound) {
 			System.out.println("El costo no me dio igual...peligro");
 		}
 		return path;
@@ -949,12 +939,12 @@ public class PulseAlgorithm {
 		path.add(0);
 	
 		while(termine == false) {
-			int nodoActual = network.destiny;
-			for(int i = 0; i < network.getVertexByID(nodoInicial).magicIndex.size(); i++) {
-				int e = (Integer) network.getVertexByID(nodoInicial).magicIndex.get(i);
+			int nodoActual = PulseGraph.destiny;
+			for(int i = 0; i < PulseGraph.getVertexByID(nodoInicial).magicIndex.size(); i++) {
+				int e = (Integer) PulseGraph.getVertexByID(nodoInicial).magicIndex.get(i);
 				int a = DataHandler.Arcs[e][1];
-				if(costoAcumulado + DataHandler.Distance[e] + network.getVertexByID(a).maxDist == network.PrimalBound ) {
-					if(tiempoAcumulado+ DataHandler.Time[e] + network.getVertexByID(a).minTime == network.TimeStar) {
+				if(costoAcumulado + DataHandler.Distance[e] + PulseGraph.getVertexByID(a).maxDist == PulseGraph.PrimalBound ) {
+					if(tiempoAcumulado+ DataHandler.Time[e] + PulseGraph.getVertexByID(a).minTime == PulseGraph.TimeStar) {
 						costoAcumulado+=DataHandler.Distance[e];
 						tiempoAcumulado+=DataHandler.Time[e];
 						nodoActual = a;	
@@ -964,13 +954,13 @@ public class PulseAlgorithm {
 			}
 		
 			path.add(nodoActual);
-			if(nodoActual == network.destiny) {
+			if(nodoActual == PulseGraph.destiny) {
 				termine = true;
 			}else {
 				nodoInicial = nodoActual;
 			}
 		}
-		if(costoAcumulado != network.PrimalBound) {
+		if(costoAcumulado != PulseGraph.PrimalBound) {
 			System.out.println("El costo no me dio igual...peligro");
 		}
 		return path;
@@ -984,19 +974,19 @@ public class PulseAlgorithm {
 	public static ArrayList<Integer> recoverThePath(PulseGraph network){
 		ArrayList<Integer> path = new ArrayList<Integer>();
 	
-		if(network.best == 1) {
+		if(PulseGraph.best == 1) {
 			path = returnPathF(network);
 		}
-		else if (network.best == 2) {
+		else if (PulseGraph.best == 2) {
 			path = returnPathF2(network);
 		}
-		else if(network.best == 3) {
+		else if(PulseGraph.best == 3) {
 			path = returnPathB(network);
 		}	
-		else if(network.best == 4) {
+		else if(PulseGraph.best == 4) {
 			path = returnPathB2(network);
 		}
-		else if(network.best == 5){
+		else if(PulseGraph.best == 5){
 			path = returnPathJP(network);
 		}
 		else {
@@ -1009,19 +999,19 @@ public class PulseAlgorithm {
 	public static String whoFindThePath(PulseGraph network){
 		String rta = "";
 	
-		if(network.best == 1) {
+		if(PulseGraph.best == 1) {
 			rta = "Minimum cost path completion in forward direction";
 		}
-		else if (network.best == 2) {
+		else if (PulseGraph.best == 2) {
 			rta = "Minimum time path completion in forward direction";
 		}
-		else if(network.best == 3) {
+		else if(PulseGraph.best == 3) {
 			rta = "Minimum cost path completion in backward direction";
 		}	
-		else if(network.best == 4) {
+		else if(PulseGraph.best == 4) {
 			rta = "Minimum time path completion in backward direction";
 		}
-		else if(network.best == 5) {
+		else if(PulseGraph.best == 5) {
 			rta = "Join paths!";
 		}
 		else {

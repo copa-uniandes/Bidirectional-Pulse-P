@@ -83,11 +83,11 @@ public class DukqstraDist {
 		highLevelBuckets = new AproxBucket[numHigh];
 		
 		if(type == 1){
-			G.getVertexByID(source).setMinDist(0);
+			PulseGraph.getVertexByID(source).setMinDist(0);
 		}
 		if(type == 2){
-			G.getVertexByID(source).setMinDist(0);
-			G.getVertexByID(source).setMinDistB(0);
+			PulseGraph.getVertexByID(source).setMinDist(0);
+			PulseGraph.getVertexByID(source).setMinDistB(0);
 		}
 		Snum = 0;
 		numNodes = G.getNumNodes();
@@ -98,7 +98,7 @@ public class DukqstraDist {
 		iH = -1;
 		jH = -1;
 		
-		Bucket st =new Bucket(G.getVertexByID(source), 0);
+		Bucket st =new Bucket(PulseGraph.getVertexByID(source), 0);
 		lowLevelBuckets[0] = st;
 		//AproxBucket st2 =new AproxBucket(G.getVertexByID(source), 0);
 		initializeBuckets();
@@ -521,7 +521,7 @@ public class DukqstraDist {
 		lowLevelBuckets = new Bucket[Delta];
 		numHigh = (int)(((C+1)/Delta))+1;
 		highLevelBuckets = new AproxBucket[numHigh];
-		Bucket st =new Bucket(G.getVertexByID(source), 0);
+		Bucket st =new Bucket(PulseGraph.getVertexByID(source), 0);
 		lowLevelBuckets[0] = st;
 		initializeBuckets();
 		iH = -1;

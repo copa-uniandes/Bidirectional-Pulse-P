@@ -16,7 +16,6 @@ package dataStructures;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -65,6 +64,7 @@ public class Settings {
 		File file = new File(ConfigFile);
 		type = ty;
 		
+		@SuppressWarnings("resource")
 		BufferedReader bufRdr  = new BufferedReader(new FileReader(file));
 		String line = null;
 		
